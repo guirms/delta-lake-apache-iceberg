@@ -9,10 +9,16 @@
 
 ## Requisitos
 
-- Python +3.6
+- Python +3.6 - https://www.python.org/downloads/
+- Pip(caso não venha junto com o pyhton) - https://pip.pypa.io/en/stable/installation/
 - Java +8.0
 
 ## Instalação
+
+Instalar Jupyter Notbook
+```bash
+pip install jupyterlab
+```
 
 Instalar PySpark
 ```bash
@@ -27,4 +33,10 @@ pip install delta-spark
 Instalar Apache Iceberg
 ```bash
 pip install iceberg
+```
+
+## Rodar projeto
+No seu Prompt de comando rodar
+```bash
+python -m notebook
 ```
