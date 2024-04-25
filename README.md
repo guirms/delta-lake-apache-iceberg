@@ -104,7 +104,7 @@ delta_table = DeltaTable.forPath(spark, "/content/data/delta-table")
 
 #### 2.1 INSERT
 ```py
-# Inserir dados de outro CSV
+# Inserir um dado novo
 from datetime import datetime
 
 data = [(datetime(2024, 4, 25), 12, 10, 103, 650, 17.8, 20.57845)]
