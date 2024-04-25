@@ -129,7 +129,7 @@ new_df.write.mode(saveMode="append").format("delta").save("data/delta-table")
 #### 2.2 UPDATE
 ```py
 delta_table.update(
-    condition="FL_DATE = '2006-02-15' AND ARR_TIME = '19.766666'",
+    condition="FL_DATE = '2024-04-25' AND ARR_DELAY = '10'",
     set={"ARR_DELAY": '12'}
 )
 ```
@@ -139,10 +139,8 @@ delta_table.update(
 
 #### 2.3 DELETE
 ```py
-delta_table.delete("FL_DATE = '2006-02-15' AND ARR_TIME = '19.766666'")
+delta_table.delete("FL_DATE = '2024-04-25'")
 ```
-
-Neste exemplo de DELETE, o primeiro elemento da tabela foi deletado.
 
 ![image](https://github.com/guirms/delta-lake-apache-iceberg/assets/102368879/fb37e2b8-11bc-4278-909a-8eec60bb2aeb)
 
