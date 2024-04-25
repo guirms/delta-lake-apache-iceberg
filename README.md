@@ -111,6 +111,9 @@ Neste exemplo de DELETE, o primeiro elemento da tabela foi deletado.
 ##### Depois: 
 ![image](https://github.com/guirms/delta-lake-apache-iceberg/assets/102368879/0680b43e-5c2e-4f9d-b11d-bc2859cb9f18)
 
+#### 2.3 Modelo fisíco
+![image](blob:https://web.whatsapp.com/8f7363e0-a384-470a-9746-e6b17e02025c)
+
 # Apache Iceberg com Spark
 
 ## 1. Como iniciar o ambiente pré configurado
