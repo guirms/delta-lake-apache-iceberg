@@ -22,6 +22,8 @@ Flights 1m - https://www.tablab.app/view/parquet?datatable-source=demo-flights-1
 
 # PySpark com Delta Lake
 
+[Link do notebook](https://github.com/guirms/delta-lake-apache-iceberg/blob/main/ApacheSpark-DeltaLake.ipynb)
+
 ### 1. Como configurar o ambiente PySpark com Delta Lake
 Para rodar e configurar o ambiente PySpark com Delta lake foi utilizado o [Google Colab](https://colab.research.google.com/).
 
