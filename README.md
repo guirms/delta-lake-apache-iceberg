@@ -112,7 +112,7 @@ Neste exemplo de DELETE, o primeiro elemento da tabela foi deletado.
 ![image](https://github.com/guirms/delta-lake-apache-iceberg/assets/102368879/0680b43e-5c2e-4f9d-b11d-bc2859cb9f18)
 
 #### 2.3 Modelo fisíco
-![image](https://github.com/guirms/delta-lake-apache-iceberg/assets/98506943/58bf6e08-1fda-4541-8ea0-bb55333d81a1)
+![image](https://github.com/guirms/delta-lake-apache-iceberg/assets/98506943/942c49a2-7ed4-44e8-93d1-5ce12128e1ea)
 
 # Apache Iceberg com Spark
 
