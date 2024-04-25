@@ -7,6 +7,9 @@
  - [Bruna Savi](https://github.com/brsavii)
  - [Kauã Librelato da Costa](https://github.com/KauaLibrelato)
 
+## Modelo fisíco
+![image](https://github.com/guirms/delta-lake-apache-iceberg/assets/98506943/942c49a2-7ed4-44e8-93d1-5ce12128e1ea)
+
 ## Dataset utilizado
 Flights 1m - https://www.tablab.app/view/parquet?datatable-source=demo-flights-1m (caso não abra com esse link utilizar esse https://www.tablab.app/datasets/sample/parquet > Flights 1m)
 
@@ -46,7 +49,6 @@ Após criar o Notebook você deve realizar o download e upar o arquivo parquet d
 ```py
 import pyspark
 from delta import *
-from delta.tables import *
 ```
 
 
@@ -77,21 +79,52 @@ df.write.mode(saveMode="overwrite").format("delta").save("data/delta-table")
 #### 1.6 Visualizar tabela delta já populada
 ```py
 # Lendo os dados
-print("Reading delta file ...!")
-
 got_df = spark.read.format("delta").load("data/delta-table")
-got_df.show()
+orderby_df = got_df.orderBy(got_df.FL_DATE.desc())
+
+orderby_df.show()
 ```
+
+![image](https://github.com/guirms/delta-lake-apache-iceberg/assets/102368879/fd2679d5-2b27-47c5-a69c-9ca0eac74557)
 
 
 ### 2. Operações de INSERT, UPDATE e DELETE
 
-#### 2.0 INSERT
-```py
+#### 2.0 Configurando 
+Precisamos criar um objeto com o caminho da tabela para conseguirmos fazer as opereções de UPDATE e DELETE
 
+```py
+from delta.tables import *
+from pyspark.sql.types import DateType, ShortType, FloatType 
+
+delta_table = DeltaTable.forPath(spark, "/content/data/delta-table")
 ```
 
-#### 2.1 UPDATE
+#### 2.1 INSERT
+```py
+# Inserir dados de outro CSV
+from datetime import datetime
+
+data = [(datetime(2024, 4, 25), 12, 10, 103, 650, 17.8, 20.57845)]
+
+schema = StructType([
+    StructField("FL_DATE", DateType(), True),
+    StructField("DEP_DELAY", ShortType(), True),
+    StructField("ARR_DELAY", ShortType(), True),
+    StructField("AIR_TIME", ShortType(), True),
+    StructField("DISTANCE", ShortType(), True),
+    StructField("DEP_TIME", FloatType(), True),
+    StructField("ARR_TIME", FloatType(), True),
+])
+
+new_df = spark.createDataFrame(data=data, schema=schema)
+new_df.write.mode(saveMode="append").format("delta").save("data/delta-table")
+```
+
+![image](https://github.com/guirms/delta-lake-apache-iceberg/assets/102368879/8f747d95-facd-46ce-ba19-7b218988376e)
+
+
+#### 2.2 UPDATE
 ```py
 delta_table.update(
     condition="FL_DATE = '2006-02-15' AND ARR_TIME = '19.766666'",
@@ -99,20 +132,18 @@ delta_table.update(
 )
 ```
 
-#### 2.2 DELETE
+![image](https://github.com/guirms/delta-lake-apache-iceberg/assets/102368879/74d1c5f6-779b-4f5a-8795-0b1438beaa1c)
+
+
+#### 2.3 DELETE
 ```py
 delta_table.delete("FL_DATE = '2006-02-15' AND ARR_TIME = '19.766666'")
 ```
 
 Neste exemplo de DELETE, o primeiro elemento da tabela foi deletado.
-##### Antes: 
-![image](https://github.com/guirms/delta-lake-apache-iceberg/assets/102368879/0ff03ca6-595c-4b88-be58-ceaf0c9daf41)
 
-##### Depois: 
-![image](https://github.com/guirms/delta-lake-apache-iceberg/assets/102368879/0680b43e-5c2e-4f9d-b11d-bc2859cb9f18)
+![image](https://github.com/guirms/delta-lake-apache-iceberg/assets/102368879/fb37e2b8-11bc-4278-909a-8eec60bb2aeb)
 
-#### 2.3 Modelo fisíco
-![image](https://github.com/guirms/delta-lake-apache-iceberg/assets/98506943/942c49a2-7ed4-44e8-93d1-5ce12128e1ea)
 
 # Apache Iceberg com Spark
 
@@ -135,7 +166,7 @@ Ao acessar o Jupyter Notebook, acesse o arquivo `main.ipynb` clicando duas vezes
 ![image](https://github.com/guirms/delta-lake-apache-iceberg/assets/85650237/645699af-b5a0-4195-b32f-9a6f83f1907d)
 
 ### 1.3 Código completo `main.ipynb`
-```
+```py
 import os
 import pyspark
 from pyspark.sql import SparkSession
@@ -186,7 +217,7 @@ df.show()
 
 ### 2.1 Importações
 Importações necessárias para que o programa funcione
-```
+```py
 import os
 import pyspark
 from pyspark.sql import SparkSession
@@ -194,7 +225,7 @@ from pyspark.sql import SparkSession
 
 ### 2.2 Configurações do Apache Iceberg
 Criação de variável com configurações necessárias para criar uma sessão no Spark. Entre as configurações está a declaração do pacote do Iceberg e da AWS SDK. Além disso, é configurado que o Spark utilize use o Iceberg como catálogo e especificado o nome da pasta que deve ser criada com as configurações da warehouse.
-```
+```py
 conf = (
     pyspark.SparkConf()
         .setAppName('app_name')
@@ -212,13 +243,13 @@ conf = (
 ```
 ### 2.3 Criação da sessão Spark
 Com base nas configurações criadas anteriormente, é criada uma instância Spark *caso ainda não exista*
-```
+```py
 spark = SparkSession.builder.config(conf=conf).getOrCreate()
 ```
 
 ### 2.4 Criação da tabela com base no dataset
 Criação da tabela `flights_data_1m` a partir de um arquivo *.parquet* armazenado localmente
-```
+```py
 # Criar tabela com base no dataset
 df = spark.read.option("header",True).parquet("./parquet-data/flights.parquet")
 df.writeTo("iceberg.flights_data_1m").create()
@@ -226,7 +257,7 @@ df.writeTo("iceberg.flights_data_1m").create()
 
 ### 2.5 Comando INSERT
 Inserir uma nova linha na tabela `flights_data_1m`
-```
+```py
 df = spark.sql("""INSERT INTO iceberg.flights_data_1m
 (FL_DATE, DEP_DELAY, ARR_DELAY, AIR_TIME, DISTANCE, DEP_TIME, ARR_TIME) VALUES 
 (NOW(), 7, -3, 480, 3711, 13.21, 14.2121)""")
@@ -234,19 +265,19 @@ df = spark.sql("""INSERT INTO iceberg.flights_data_1m
 
 ### 2.5 Comando UPDATE
 Atualizar uma linha da tabela `flights_data_1m` onde o valor da coluna da data do voo *FL_DATE* é maior que o dia 01/01/2024
-```
+```py
 df = spark.sql("""UPDATE iceberg.flights_data_1m SET DEP_DELAY = 8 WHERE FL_DATE > '2024-01-01'""")
 ```
 
 ### 2.6 Comando DELETE
 Atualizar uma linha da tabela `flights_data_1m` onde o valor da coluna da data do voo *FL_DATE* é maior que o dia 01/01/2024
-```
+```py
 df = spark.sql("""DELETE FROM iceberg.flights_data_1m WHERE FL_DATE > '2024-01-01'""")
 ```
 
 ### 2.7 Comando SELECT
 Lê todas as colunas das cinco primeiras linhas da tabela `flights_data_1m` onde o valor da coluna da data do voo *FL_DATE* é maior que o dia 01/01/2024
-```
+```py
 df = spark.sql("SELECT * FROM iceberg.flights_data_1m WHERE FL_DATE > '2006-01-01' ORDER BY FL_DATE DESC LIMIT 5")
 df.show()
 ```
